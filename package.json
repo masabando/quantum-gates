@@ -50,6 +50,8 @@
     "clean:lib": "rm -rf ./dist",
     "test": "vitest",
     "test:run": "vitest run --coverage",
+    "fin:patch": "npm run prepare && npm version patch",
+    "fin:minor": "npm run prepare && npm version minor",
     "prepare": "npm run test:run && npm run build:lib"
   },
   "devDependencies": {

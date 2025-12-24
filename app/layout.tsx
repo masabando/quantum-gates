@@ -1,6 +1,7 @@
 import { Noto_Sans_JP } from "next/font/google";
 import Menu from "@/component/Menu";
 import "./globals.css";
+import Footer from "@/component/Footer";
 
 const notoSans = Noto_Sans_JP({
   variable: "--font-noto-sans-jp",
@@ -19,6 +20,7 @@ export default function RootLayout({
       >
         <Menu />
         {children}
+        <Footer />
       </body>
     </html>
   );
