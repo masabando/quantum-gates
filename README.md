@@ -7,207 +7,136 @@
 ![license](https://img.shields.io/github/license/masabando/quantum-gates?style=flat)
 ![stars](https://img.shields.io/github/stars/masabando/quantum-gates?style=flat&logo=github)
 
-# easy-three
+# quantum-gates
 
 [&#x1f389; Documentation](https://masabando.github.io/quantum-gates/)
 
-Create stunning 3D with simple code.
+A JavaScript library for simulating 1-qubit quantum gates and Composite Gates.
 
-## Three.js made simple
-Three.js's powerful features, simplified for beginners.  
-easy-three supports everything from creating objects to animations and lighting setups.
-
-## No Installation Required
-No special software or configuration is required. You can start right away with just a browser.  
-It can also be used in environments where software installation is restricted, such as schools.
-
-※ A server is required when loading resources such as images.
-
-## Simple Code
-You can create 3D objects with short code.  
-Animations can also be set up easily.
+## see quantum states in 3D
+See how quantum states move on the Bloch sphere.  
+Drag, rotate, and explore them in 3D.
 
 ```js
-const { camera, create, animate } = init()
-camera.position.set(1, 1, 1)
-create.ambientLight()
-create.directionalLight()
-const cube = create.cube({ rounded: true, segments: 7 })
-animate(({ time }) => {
-  cube.rotation.x = time
-  cube.rotation.y = time
+import { init } from "@masabando/easy-three";
+import { QTool, QState } from "@masabando/quantum-gates";
+QTool.createAnimation({
+  init,
+  target: "#bloch",
+  pulseName: "reduced CORPSE/BB1",
+  angle: Math.PI / 2,
+  phi: 0,
+  initState: new QState([1, 0]),
+  speed: 4,
 })
 ```
 
-## Quick and Easy Model Setup
-Displaying models like VRM is simple ( internally uses three-vrm).  
-Mouse-based camera operation is also easy.
-
-## Can also be used with React
-You can also use it directly with React.  
-Perfect for adding a touch of 3D to your web page.
+## quantify gate quality
+Visualize gate robustness with a fidelity map.  
+Scan pulse-length and off-resonance errors in one view.
 
 ```js
-const Simple = (props) => {
-  const ref = useRef()
-  useEffect(() => {
-    const { camera, create, animate, destroy } = init(ref.current)
-    camera.position.set(5, 5, 5);
-    create.ambientLight()
-    create.directionalLight()
-    const cube = create.cube({ size: 3 })
-    animate(({ time }) => {
-      cube.rotation.x = time
-      cube.rotation.y = time
-    })
-    return () => {
-      destroy()
-    }
-  }, [])
-  return (
-    <div ref={ref} {...props}></div>
-  )
-}
+import { QTool } from "@masabando/quantum-gates";
+QTool.createFidelityMap({
+  target: "#target",
+  gateName: "reduced CORPSE/BB1",
+  theta: Math.PI,
+  phi: 0,
+  width: 400,
+  height: 400,
+  // [ optional ]
+  // threshold: 0.9999,
+  // error: {
+  //   ple: { min: -0.1, max: 0.1, step: 0.005 },
+  //   ore: { min: -0.1, max: 0.1, step: 0.005 }
+  // },
+  // fillStyle: (val) => `rgb(${val}, ${val}, ${val})`,
+});
+```
+
+## stop fightingquantum gateswith math
+
+Quantum gates can be defined directly as rotations.  
+You don’t need to write matrices to simulate their behavior.
+
+
+
+```js
+import { QGate, QState } from "@masabando/quantum-gates";
+// Not Gate (with global phase)
+// rotation around X-axis by PI
+const gate = new QGate(Math.PI, [1, 0, 0])
+// Initial State |0>
+const state = new QState([1, 0])
+// Bloch Vector (0, 0, 1)
+console.log(state.xyz);
+// X|0> = |1>
+const finalState = gate.apply(state);
+// Bloch Vector (0, 0, -1)
+console.log(finalState.xyz);
+```
+
+## simple pulses becomerobust gates
+
+Composite pulses are just sequences of simple rotations.  
+They can be built directly from individual gates.
+
+```js
+import { QGate, QState } from "@masabando/quantum-gates";
+// Pulse Length Error
+const ple = 0.1; // 10% pulse length error
+// up spin (0, 0, 1)
+const initialState = new QState([1, 0]);
+console.log(initialState.xyz);
+// ple-affected 180y pulse (-0.31, 0, -0.95)
+const pulse = new QGate(Math.PI * (1 + ple), [0, 1, 0]);
+console.log(pulse.apply(initialState).xyz);
+// composite pulse
+// 90x
+const p1 = new QGate(Math.PI / 2 * (1 + ple), [1, 0, 0])
+// 180y
+const p2 = new QGate(Math.PI * (1 + ple), [0, 1, 0])
+// 90x
+const p3 = new QGate(Math.PI / 2 * (1 + ple), [1, 0, 0])
+const compositePulse = p3.multiply(p2).multiply(p1);
+// (0.05, 0.01, -1)
+console.log(compositePulse.apply(initialState).xyz);
+```
+
+
+## composite gatesjust work
+
+Composite quantum gates can be used just like single gates.  
+You can also evaluate them numerically by computing fidelity.
+
+```js
+import { QGate, QTool, CPList } from "@masabando/quantum-gates";
+// error values for testing
+// 10% pulse length error and 10% off-resonance error
+const ple = 0.1;
+const ore = 0.1;
+// ideal 180x gate
+const idealGate = new QGate(Math.PI, [1, 0, 0]);
+// erroneous simple gate
+const plain = QTool.evalGate(CPList["plain"].pulse, Math.PI, 0, ple, ore);
+// erroneous composite gate
+const corpse = QTool.evalGate(CPList["CORPSE"].pulse, Math.PI, 0, ple, ore);
+// erroneous concatenated composite gate
+const cccp = QTool.evalGate(CPList["reduced CORPSE/SK1"].pulse, Math.PI, 0, 
+// fidelities
+// 0.983
+console.log(plain.fidelity(idealGate))
+// 0.987
+console.log(corpse.fidelity(idealGate))
+// 0.995
+console.log(cccp.fidelity(idealGate))
 ```
 
 # How to Use
-
-See [Getting Started](https://masabando.github.io/easy-three/getting-started/)
 
 
 ## Using npm
 
 ```bash
-npm install @masabando/easy-three
-```
-
-```js
-import { init } from "@masabando/easy-three";
-const { camera, create, animate, controls } = init();
-```
-
-### React
-EasyThreeContainer requires antd to be installed.
-```bash
-npm install antd
-```
-
-```js
-import { init } from "@masabando/easy-three";
-import EasyThreeContainer from "@masabando/easy-three/react/EasyThreeContainer";
-
-const Sample() = {
-  return (
-    <EasyThreeContainer
-      code={(r) => {
-        const { camera, create, animate, destroy } = init(r);
-
-        camera.position.set(5, 5, 5);
-        create.ambientLight();
-        create.directionalLight();
-
-        const cube = create.cube({ size: 3 });
-
-        animate(({ time }) => {
-          cube.rotation.x = time;
-          cube.rotation.y = time;
-        });
-
-        return { destroy };
-      }}
-     />
-  )
-}
-```
-Function `destroy` is used to clean up the scene when the component is unmounted.
-
-If you want to use toggleControls for camera control, you can use it like this.
-```js
-import { init } from "@masabando/easy-three";
-import EasyThreeContainer from "@masabando/easy-three/react/EasyThreeContainer";
-
-const Sample() = {
-  return (
-    <EasyThreeContainer
-      toggleControls
-      code={(r) => {
-        const { camera, create, controls, animate, destroy } = init(r);
-
-        camera.position.set(5, 5, 5);
-        create.ambientLight();
-        create.directionalLight();
-
-        const cube = create.cube({ size: 3 });
-
-        animate(({ time }) => {
-          cube.rotation.x = time;
-          cube.rotation.y = time;
-        });
-
-        return { destroy, controls };
-      }}
-     />
-  )
-}
-```
-
-
-## Using CDN
-
-You can use easy-three without downloading by using a CDN.
-Importmap settings are also required.
-```html
-<script type="importmap">
-  {
-    "imports": {
-      "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
-      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/",
-      "@pixiv/three-vrm": "https://cdn.jsdelivr.net/npm/@pixiv/three-vrm@3/lib/three-vrm.module.min.js",
-      "easy-three": "https://cdn.jsdelivr.net/gh/masabando/easy-three@1.1.2/dist/easy-three.js"
-    }
-  }
-</script>
-```
-
-```js
-import { init } from "easy-three";
-```
-
-## template
-```html
-<!DOCTYPE html>
-<html lang="ja">
-
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>easy-three template</title>
-  <script type="importmap">
-    {
-      "imports": {
-        "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
-        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/",
-        "@pixiv/three-vrm": "https://cdn.jsdelivr.net/npm/@pixiv/three-vrm@3/lib/three-vrm.module.min.js",
-        "easy-three": "https://cdn.jsdelivr.net/gh/masabando/easy-three@1.1.2/dist/easy-three.js"
-      }
-    }
-  </script>
-</head>
-
-<body>
-  <script type="module">
-    import { init } from "easy-three";
-    const { camera, create, animate, controls } = init();
-
-    controls.connect()
-    camera.position.set(-2, 2, 2)
-    create.ambientLight()
-    create.directionalLight()
-    create.cube()
-
-    animate()
-  </script>
-</body>
-
-</html>
+npm install @masabando/quantum-gates @masabando/easy-three
 ```
