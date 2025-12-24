@@ -1,26 +1,76 @@
 {
-  "name": "quantum-gates",
+  "name": "@masabando/quantum-gates",
+  "type": "module",
   "version": "0.1.0",
-  "private": true,
+  "author": "masabando",
+  "description": "A JavaScript library for simulating 1-qubit quantum gates and Composite Gates.",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "license": "MIT",
+  "keywords": [
+    "quantum",
+    "quantum-computing",
+    "quantum-gates",
+    "composite-pulses",
+    "concatenated composite pulses",
+    "concatenated composite gates",
+    "quantum-simulation",
+    "bloch-sphere",
+    "typescript",
+    "javascript",
+    "library"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "homepage": "https://masabando.github.io/quantum-gates/",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "sideEffects": false,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "npm run build:lib && npm run build:docs",
     "start": "next start",
-    "lint": "eslint"
-  },
-  "dependencies": {
-    "next": "16.1.0",
-    "react": "19.2.3",
-    "react-dom": "19.2.3"
+    "lint": "eslint",
+    "changeset": "changeset",
+    "changeset:version": "changeset version",
+    "dev:lib": "tsup --watch --tsconfig ./tsconfig.lib.json",
+    "dev:docs": "next dev",
+    "build:lib": "tsup --tsconfig ./tsconfig.lib.json",
+    "build:docs": "next build",
+    "clean:lib": "rm -rf ./dist",
+    "test": "vitest",
+    "test:run": "vitest run --coverage",
+    "prepare": "npm run test:run && npm run build:lib"
   },
   "devDependencies": {
+    "@masabando/easy-three": "^1.11.6",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@types/react-syntax-highlighter": "^15.5.13",
+    "@vitest/coverage-v8": "^4.0.16",
+    "daisyui": "^5.5.14",
     "eslint": "^9",
     "eslint-config-next": "16.1.0",
+    "next": "^16.1.0",
+    "react": "^19.2.3",
+    "react-dom": "^19.2.3",
+    "react-syntax-highlighter": "^16.1.0",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "tsup": "^8.5.1",
+    "tsx": "^4.21.0",
+    "typescript": "^5",
+    "vitest": "^4.0.16"
   }
 }

@@ -1,65 +1,233 @@
-import Image from "next/image";
+"use client";
+import Code from "@/component/misc/Code";
+import Keyword from "@/component/misc/Keyword";
+import NpmCommand from "@/component/misc/NpmCommand";
+import SubTitle from "@/component/misc/SubTitle";
+import { QTool, QState } from "../dist/index"
+import { useEffect, useRef } from "react";
+import { init } from "@masabando/easy-three";
 
 export default function Home() {
+  const animationRef = useRef<HTMLDivElement>(null);
+  const fidelityMapRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const { destroy } = QTool.createAnimation({
+      init,
+      target: animationRef.current,
+      pulseName: "reduced CORPSE/BB1",
+      angle: Math.PI / 2,
+      phi: 0,
+      initState: new QState([1, 0]),
+      speed: 4,
+    });
+
+    QTool.createFidelityMap({
+      target: fidelityMapRef.current,
+      gateName: "reduced CORPSE/BB1",
+      theta: Math.PI,
+      phi: 0,
+      width: 300,
+      height: 300,
+    });
+    return destroy
+  }, []);
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+    <div>
+      <title>quantum-gates</title>
+      <div className="px-4 pt-20 pb-40 flex flex-col gap-10 text-center">
+        <h1 className="mb-10 text-center text-4xl font-bold md:text-5xl lg:text-6xl">
+          quantum-gates
+        </h1>
+        <div className="mb-8 text-center leading-7 text-base-content/70 md:text-lg">
+          A JavaScript library for simulating 1-qubit quantum gates and Composite Gates.
+        </div>
+
+        <NpmCommand />
+
+        
+        <div className="mt-16">
+          <SubTitle>
+            see quantum
+            states
+            in <Keyword>3D</Keyword>
+          </SubTitle>
+          <p className="mb-8 text-sm font-light">
+            See how quantum states move on the Bloch sphere.<br />
+            Drag, rotate, and explore them in 3D.
           </p>
+          <div>
+            ＼ drag me ／
+          </div>
+          <div ref={animationRef} style={{
+            width: "400px",
+            aspectRatio: "1 / 1",
+            maxWidth: "80%",
+            margin: "0 auto",
+          }}></div>
+          <Code className="text-xs" code={
+            `import { init } from "@masabando/easy-three";
+import { QTool, QState } from "@masabando/quantum-gates";
+QTool.createAnimation({
+  init,
+  target: "#bloch",
+  pulseName: "reduced CORPSE/BB1",
+  angle: Math.PI / 2,
+  phi: 0,
+  initState: new QState([1, 0]),
+  speed: 4,
+})`}>
+          </Code>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+
+
+
+        <div className="mt-16">
+          <SubTitle>
+            <Keyword>quantify</Keyword>
+            gate
+            quality
+          </SubTitle>
+          <p className="mb-8 text-sm font-light">
+            Visualize gate robustness with a fidelity map.<br />
+            Scan pulse-length and off-resonance errors in one view.
+          </p>
+          <div className="flex justify-center my-4 max-w-[60%] mx-auto">
+            <div ref={fidelityMapRef}></div>
+          </div>
+          <Code className="text-xs" code={
+            `import { QTool } from "@masabando/quantum-gates";
+QTool.createFidelityMap({
+  target: "#target",
+  gateName: "reduced CORPSE/BB1",
+  theta: Math.PI,
+  phi: 0,
+  width: 400,
+  height: 400,
+  // [ optional ]
+  // threshold: 0.9999,
+  // error: {
+  //   ple: { min: -0.1, max: 0.1, step: 0.005 },
+  //   ore: { min: -0.1, max: 0.1, step: 0.005 }
+  // },
+  // fillStyle: (val) => \`rgb(\${val}, \${val}, \${val})\`,
+});
+`}>
+          </Code>
         </div>
-      </main>
+
+
+
+        <div className="mt-16">
+          <SubTitle>
+            stop fighting
+            <Keyword>quantum gates</Keyword>
+            with math
+          </SubTitle>
+          <p className="mb-8 text-sm font-light">
+            Quantum gates can be defined directly as rotations.<br />
+            You don’t need to write matrices to simulate their behavior.
+          </p>
+          <Code className="text-xs" code={
+`import { QGate, QState } from "@masabando/quantum-gates";
+// Not Gate (with global phase)
+// rotation around X-axis by PI
+const gate = new QGate(Math.PI, [1, 0, 0])
+
+// Initial State |0>
+const state = new QState([1, 0])
+
+// Bloch Vector (0, 0, 1)
+console.log(state.xyz);
+
+// X|0> = |1>
+const finalState = gate.apply(state);
+
+// Bloch Vector (0, 0, -1)
+console.log(finalState.xyz);`}>
+          </Code>
+        </div>
+
+
+
+        <div className="mt-16">
+          <SubTitle>
+            simple pulses
+            become
+            <Keyword>robust gates</Keyword>
+          </SubTitle>
+          <p className="mb-8 text-sm font-light">
+            Composite pulses are just sequences of simple rotations.<br />
+            They can be built directly from individual gates.
+          </p>
+          <Code className="text-xs" code={
+`import { QGate, QState } from "@masabando/quantum-gates";
+
+// Pulse Length Error
+const ple = 0.1; // 10% pulse length error
+
+// up spin (0, 0, 1)
+const initialState = new QState([1, 0]);
+console.log(initialState.xyz);
+
+// ple-affected 180y pulse (-0.31, 0, -0.95)
+const pulse = new QGate(Math.PI * (1 + ple), [0, 1, 0]);
+console.log(pulse.apply(initialState).xyz);
+
+// composite pulse
+// 90x
+const p1 = new QGate(Math.PI / 2 * (1 + ple), [1, 0, 0])
+// 180y
+const p2 = new QGate(Math.PI * (1 + ple), [0, 1, 0])
+// 90x
+const p3 = new QGate(Math.PI / 2 * (1 + ple), [1, 0, 0])
+const compositePulse = p3.multiply(p2).multiply(p1);
+// (0.05, 0.01, -1)
+console.log(compositePulse.apply(initialState).xyz);`}>
+          </Code>
+        </div>
+
+
+
+        <div className="mt-16">
+          <SubTitle>
+            <Keyword>composite gates</Keyword>
+            just
+            work
+          </SubTitle>
+          <p className="mb-8 text-sm font-light">
+            Composite quantum gates can be used just like single gates.<br />
+            You can also evaluate them numerically by computing fidelity.
+          </p>
+          <Code className="text-xs" code={
+`import { QGate, QTool, CPList } from "@masabando/quantum-gates";
+
+// error values for testing
+// 10% pulse length error and 10% off-resonance error
+const ple = 0.1;
+const ore = 0.1;
+
+// ideal 180x gate
+const idealGate = new QGate(Math.PI, [1, 0, 0]);
+
+// erroneous simple gate
+const plain = QTool.evalGate(CPList["plain"].pulse, Math.PI, 0, ple, ore);
+// erroneous composite gate
+const corpse = QTool.evalGate(CPList["CORPSE"].pulse, Math.PI, 0, ple, ore);
+// erroneous concatenated composite gate
+const cccp = QTool.evalGate(CPList["reduced CORPSE/SK1"].pulse, Math.PI, 0, 
+
+// fidelities
+// 0.983
+console.log(plain.fidelity(idealGate))
+// 0.987
+console.log(corpse.fidelity(idealGate))
+// 0.995
+console.log(cccp.fidelity(idealGate))`}>
+          </Code>
+        </div>
+      </div>
     </div>
   );
 }

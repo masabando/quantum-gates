@@ -1,36 +1,213 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+![version](https://img.shields.io/github/v/tag/masabando/quantum-gates?style=flat&label=version)  
+![last-commit](https://img.shields.io/github/last-commit/masabando/quantum-gates?style=flat)
+![page-build-status](https://img.shields.io/github/actions/workflow/status/masabando/quantum-gates/nextjs.yml?style=flat)
 
-## Getting Started
+![hits](https://img.shields.io/jsdelivr/gh/hm/masabando/quantum-gates?style=flat)
+![npm](https://img.shields.io/npm/dm/%40masabando%2Fquantum-gates?style=flat&logo=npm)  
+![license](https://img.shields.io/github/license/masabando/quantum-gates?style=flat)
+![stars](https://img.shields.io/github/stars/masabando/quantum-gates?style=flat&logo=github)
 
-First, run the development server:
+# easy-three
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+[&#x1f389; Documentation](https://masabando.github.io/quantum-gates/)
+
+Create stunning 3D with simple code.
+
+## Three.js made simple
+Three.js's powerful features, simplified for beginners.  
+easy-three supports everything from creating objects to animations and lighting setups.
+
+## No Installation Required
+No special software or configuration is required. You can start right away with just a browser.  
+It can also be used in environments where software installation is restricted, such as schools.
+
+※ A server is required when loading resources such as images.
+
+## Simple Code
+You can create 3D objects with short code.  
+Animations can also be set up easily.
+
+```js
+const { camera, create, animate } = init()
+camera.position.set(1, 1, 1)
+create.ambientLight()
+create.directionalLight()
+const cube = create.cube({ rounded: true, segments: 7 })
+animate(({ time }) => {
+  cube.rotation.x = time
+  cube.rotation.y = time
+})
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Quick and Easy Model Setup
+Displaying models like VRM is simple ( internally uses three-vrm).  
+Mouse-based camera operation is also easy.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Can also be used with React
+You can also use it directly with React.  
+Perfect for adding a touch of 3D to your web page.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```js
+const Simple = (props) => {
+  const ref = useRef()
+  useEffect(() => {
+    const { camera, create, animate, destroy } = init(ref.current)
+    camera.position.set(5, 5, 5);
+    create.ambientLight()
+    create.directionalLight()
+    const cube = create.cube({ size: 3 })
+    animate(({ time }) => {
+      cube.rotation.x = time
+      cube.rotation.y = time
+    })
+    return () => {
+      destroy()
+    }
+  }, [])
+  return (
+    <div ref={ref} {...props}></div>
+  )
+}
+```
 
-## Learn More
+# How to Use
 
-To learn more about Next.js, take a look at the following resources:
+See [Getting Started](https://masabando.github.io/easy-three/getting-started/)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Using npm
 
-## Deploy on Vercel
+```bash
+npm install @masabando/easy-three
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```js
+import { init } from "@masabando/easy-three";
+const { camera, create, animate, controls } = init();
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### React
+EasyThreeContainer requires antd to be installed.
+```bash
+npm install antd
+```
+
+```js
+import { init } from "@masabando/easy-three";
+import EasyThreeContainer from "@masabando/easy-three/react/EasyThreeContainer";
+
+const Sample() = {
+  return (
+    <EasyThreeContainer
+      code={(r) => {
+        const { camera, create, animate, destroy } = init(r);
+
+        camera.position.set(5, 5, 5);
+        create.ambientLight();
+        create.directionalLight();
+
+        const cube = create.cube({ size: 3 });
+
+        animate(({ time }) => {
+          cube.rotation.x = time;
+          cube.rotation.y = time;
+        });
+
+        return { destroy };
+      }}
+     />
+  )
+}
+```
+Function `destroy` is used to clean up the scene when the component is unmounted.
+
+If you want to use toggleControls for camera control, you can use it like this.
+```js
+import { init } from "@masabando/easy-three";
+import EasyThreeContainer from "@masabando/easy-three/react/EasyThreeContainer";
+
+const Sample() = {
+  return (
+    <EasyThreeContainer
+      toggleControls
+      code={(r) => {
+        const { camera, create, controls, animate, destroy } = init(r);
+
+        camera.position.set(5, 5, 5);
+        create.ambientLight();
+        create.directionalLight();
+
+        const cube = create.cube({ size: 3 });
+
+        animate(({ time }) => {
+          cube.rotation.x = time;
+          cube.rotation.y = time;
+        });
+
+        return { destroy, controls };
+      }}
+     />
+  )
+}
+```
+
+
+## Using CDN
+
+You can use easy-three without downloading by using a CDN.
+Importmap settings are also required.
+```html
+<script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/",
+      "@pixiv/three-vrm": "https://cdn.jsdelivr.net/npm/@pixiv/three-vrm@3/lib/three-vrm.module.min.js",
+      "easy-three": "https://cdn.jsdelivr.net/gh/masabando/easy-three@1.1.2/dist/easy-three.js"
+    }
+  }
+</script>
+```
+
+```js
+import { init } from "easy-three";
+```
+
+## template
+```html
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>easy-three template</title>
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/",
+        "@pixiv/three-vrm": "https://cdn.jsdelivr.net/npm/@pixiv/three-vrm@3/lib/three-vrm.module.min.js",
+        "easy-three": "https://cdn.jsdelivr.net/gh/masabando/easy-three@1.1.2/dist/easy-three.js"
+      }
+    }
+  </script>
+</head>
+
+<body>
+  <script type="module">
+    import { init } from "easy-three";
+    const { camera, create, animate, controls } = init();
+
+    controls.connect()
+    camera.position.set(-2, 2, 2)
+    create.ambientLight()
+    create.directionalLight()
+    create.cube()
+
+    animate()
+  </script>
+</body>
+
+</html>
+```
