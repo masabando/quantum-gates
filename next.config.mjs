@@ -1,11 +1,11 @@
-import { NextConfig } from "next";
+/** @type {import('next').NextConfig} */
 
 const nextConfig = {
   output: "export",
   reactStrictMode: false,
   assetPrefix: "/quantum-gates",
   basePath: "/quantum-gates",
-  image: {
+  images: {
     unoptimized: true,
   },
   trailingSlash: true,
