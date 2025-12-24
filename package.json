@@ -1,7 +1,7 @@
 {
   "name": "@masabando/quantum-gates",
   "type": "module",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "author": "masabando",
   "description": "A JavaScript library for simulating 1-qubit quantum gates and Composite Gates.",
   "main": "./dist/index.cjs",
@@ -53,6 +53,7 @@
     "prepare": "npm run test:run && npm run build:lib"
   },
   "devDependencies": {
+    "@changesets/changelog-github": "^0.5.2",
     "@changesets/cli": "^2.29.8",
     "@masabando/easy-three": "^1.11.6",
     "@tailwindcss/postcss": "^4",
