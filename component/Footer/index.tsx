@@ -1,5 +1,7 @@
 "use cilent"
 
+import Link from "next/link"
+
 export default function Footer() {
   return (
     <footer className="footer sm:footer-horizontal bg-base-200 text-base-content px-10 pt-10 pb-30">
@@ -13,13 +15,13 @@ export default function Footer() {
       </aside>
       <nav>
         <h6 className="footer-title">Docs</h6>
-        <a className="link link-hover">Getting Started</a>
-        <a className="link link-hover">Reference</a>
+        <Link className="link link-hover" href="/docs/getting-started">Getting Started (to be added)</Link>
+        <Link className="link link-hover" href="/docs/reference">Reference (to be added)</Link>
       </nav>
       <nav>
         <h6 className="footer-title">More</h6>
-        <a className="link link-hover">GitHub</a>
-        <a className="link link-hover">Quant. Inf. Lab.</a>
+        <a className="link link-hover" href="https://github.com/masabando/quantum-gates">GitHub</a>
+        <a className="link link-hover" href="https://alice.helixcode.net/~bando/Lab/">Quant. Inf. Lab.</a>
       </nav>
     </footer>
   )

@@ -6,7 +6,7 @@ export default function NpmCommand() {
   const [text, setText] = useState("copy");
 
   return (
-    <div className="flex animate-[reveal-top-slow_0.5s] flex-col items-center gap-6 xl:flex-row">
+    <div className="flex animate-[reveal-top-slow_0.5s] flex-col items-center gap-6">
       <div className="tooltip tooltip-accent" data-tip={text}>
         <button
           className="btn btn-sm cursor-copy rounded-full font-mono font-light"

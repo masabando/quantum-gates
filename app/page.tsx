@@ -36,7 +36,7 @@ export default function Home() {
   return (
     <div>
       <title>quantum-gates</title>
-      <div className="px-4 pt-20 pb-40 flex flex-col gap-10 text-center">
+      <div className="px-4 pt-10 pb-40 flex flex-col gap-10 text-center">
         <h1 className="mb-10 text-center text-4xl font-bold md:text-5xl lg:text-6xl">
           quantum-gates
         </h1>
