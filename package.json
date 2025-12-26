@@ -1,7 +1,7 @@
 {
   "name": "@masabando/quantum-gates",
   "type": "module",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "author": "masabando",
   "description": "A JavaScript library for simulating 1-qubit quantum gates and Composite Gates.",
   "main": "./dist/index.cjs",
