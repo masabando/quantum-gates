@@ -5,7 +5,7 @@
   "author": "masabando",
   "description": "A JavaScript library for simulating 1-qubit quantum gates and Composite Gates.",
   "main": "./dist/index.cjs",
-  "module": "./dist/index.js",
+  "module": "./dist/index.mjs",
   "license": "MIT",
   "keywords": [
     "quantum",
@@ -28,7 +28,7 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
+      "import": "./dist/index.mjs",
       "require": "./dist/index.cjs"
     }
   },
