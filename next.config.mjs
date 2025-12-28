@@ -9,6 +9,10 @@ const nextConfig = {
     unoptimized: true,
   },
   trailingSlash: true,
+  allowedDevOrigins: [
+    'localhost',
+    'mair.local'
+  ],
 };
 
 export default nextConfig;

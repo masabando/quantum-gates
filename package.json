@@ -36,6 +36,7 @@
     "dist"
   ],
   "sideEffects": false,
+  "browserlist": "> 1%",
   "scripts": {
     "dev": "next dev",
     "build": "npm run build:lib && npm run build:docs",

@@ -36,7 +36,7 @@ export default function Home() {
   return (
     <div>
       <title>quantum-gates</title>
-      <div className="px-4 pt-10 pb-40 flex flex-col gap-10 text-center">
+      <div className="px-4 pt-22 pb-40 flex flex-col gap-10 text-center">
         <h1 className="mb-10 text-center text-4xl font-bold md:text-5xl lg:text-6xl">
           quantum-gates
         </h1>
@@ -46,12 +46,12 @@ export default function Home() {
 
         <NpmCommand />
 
-        
+
         <div className="mt-16">
           <SubTitle>
             see quantum
             states
-            in <Keyword>3D</Keyword>
+            in <Keyword bold>3D</Keyword>
           </SubTitle>
           <p className="mb-8 text-sm font-light">
             See how quantum states move on the Bloch sphere.<br />
@@ -85,7 +85,7 @@ QTool.createAnimation({
 
         <div className="mt-16">
           <SubTitle>
-            <Keyword>quantify</Keyword>
+            <Keyword bold>quantify</Keyword>
             gate
             quality
           </SubTitle>
@@ -122,7 +122,7 @@ QTool.createFidelityMap({
         <div className="mt-16">
           <SubTitle>
             stop fighting
-            <Keyword>quantum gates</Keyword>
+            <Keyword bold>quantum gates</Keyword>
             with math
           </SubTitle>
           <p className="mb-8 text-sm font-light">
@@ -155,7 +155,7 @@ console.log(finalState.xyz);`}>
           <SubTitle>
             simple pulses
             become
-            <Keyword>robust gates</Keyword>
+            <Keyword bold>robust gates</Keyword>
           </SubTitle>
           <p className="mb-8 text-sm font-light">
             Composite pulses are just sequences of simple rotations.<br />
@@ -192,7 +192,7 @@ console.log(compositePulse.apply(initialState).xyz);`}>
 
         <div className="mt-16">
           <SubTitle>
-            <Keyword>composite gates</Keyword>
+            <Keyword bold>composite gates</Keyword>
             just
             work
           </SubTitle>
