@@ -18,7 +18,7 @@ export default function Footer() {
         <Link className="link link-hover" href="/docs/introduction/">Introduction</Link>
         <Link className="link link-hover" href="/docs/install/">Installation</Link>
         <Link className="link link-hover" href="/docs/cdn/">CDN</Link>
-        <Link className="link link-hover" href="/docs/reference">Reference (to be added)</Link>
+        <Link className="link link-hover" href="/docs/reference/qtool/">Reference</Link>
       </nav>
       <nav>
         <h6 className="footer-title">More</h6>

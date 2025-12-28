@@ -133,7 +133,7 @@ function concatenate(pulseA: string, pulseB: string, reduced: boolean = false): 
   }).flat()
 }
 
-function createCCCP(pulseA: string, pulseB: string, reduced: boolean = false): CP {
+export function createCCCP(pulseA: string, pulseB: string, reduced: boolean = false): CP {
   return {
     name: `${reduced ? "reduced " : ""}${pulseA}/${pulseB}`,
     robustType: "both",
