@@ -74,8 +74,33 @@ export default function Sidebar({
               </summary>
               <ul>
                 <LinkItem
+                  href="/docs/reference/complex/"
                   setSidebarChecked={setSidebarChecked}
-                ></LinkItem>
+                >Complex</LinkItem>
+                <LinkItem
+                  href="/docs/reference/constant/"
+                  setSidebarChecked={setSidebarChecked}
+                >Constant</LinkItem>
+                <LinkItem
+                  href="/docs/reference/cplist/"
+                  setSidebarChecked={setSidebarChecked}
+                >CPlist</LinkItem>
+                <LinkItem
+                  href="/docs/reference/qgate/"
+                  setSidebarChecked={setSidebarChecked}
+                >QGate</LinkItem>
+                <LinkItem
+                  href="/docs/reference/qmatrix/"
+                  setSidebarChecked={setSidebarChecked}
+                >QMatrix</LinkItem>
+                <LinkItem
+                  href="/docs/reference/qstate/"
+                  setSidebarChecked={setSidebarChecked}
+                >QState</LinkItem>
+                <LinkItem
+                  href="/docs/reference/qtool/"
+                  setSidebarChecked={setSidebarChecked}
+                >QTool</LinkItem>
               </ul>
             </details>
           </li>

@@ -30,11 +30,30 @@ export default function Home() {
       width: 300,
       height: 300,
     });
-    return destroy
+
+    const ref = fidelityMapRef.current;
+    return () => {
+      destroy();
+      ref?.replaceChildren();
+    }
   }, []);
 
   return (
     <div>
+      <div className="flex flex-col items-center mt-10">
+        <div>
+          <img alt="version" src="https://img.shields.io/github/v/tag/masabando/quantum-gates?style=flat&label=version" />
+        </div>
+        <div className="mt-2 flex justify-center gap-1 flex-wrap">
+          <img alt="npm" src="https://img.shields.io/npm/dm/%40masabando%2Fquantum-gates?style=flat&logo=npm" />
+          <img className="ms-1" alt="jsDelivr monthly hits badge" src="https://img.shields.io/jsdelivr/gh/hm/masabando/quantum-gates?style=flat&logo=jsdelivr&logoColor=white" />
+        </div>
+        <div className="mt-2 flex flex-wrap justify-center gap-1">
+          <img alt="github-stars" src="https://img.shields.io/github/stars/masabando/quantum-gates?style=flat&logo=github" />
+          <img alt="last commit" src="https://img.shields.io/github/last-commit/masabando/quantum-gates?style=flat" />
+          <img className="ms-1" alt="page build" src="https://img.shields.io/github/actions/workflow/status/masabando/quantum-gates/nextjs.yml?style=flat" />
+        </div>
+      </div>
       <title>quantum-gates</title>
       <div className="px-4 pt-22 pb-40 flex flex-col gap-10 text-center">
         <h1 className="mb-10 text-center text-4xl font-bold md:text-5xl lg:text-6xl">
