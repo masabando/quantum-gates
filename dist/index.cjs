@@ -517,8 +517,12 @@ var QTool = class _QTool {
     ore: { min: -0.1, max: 0.1, step: 1e-3 }
   }) {
     const N = {
-      ple: Math.floor((errorRange.ple.max - errorRange.ple.min) / errorRange.ple.step) + 1,
-      ore: Math.floor((errorRange.ore.max - errorRange.ore.min) / errorRange.ore.step) + 1
+      ple: Math.floor(
+        (errorRange.ple.max - errorRange.ple.min) / errorRange.ple.step
+      ) + 1,
+      ore: Math.floor(
+        (errorRange.ore.max - errorRange.ore.min) / errorRange.ore.step
+      ) + 1
     };
     const errorList = [];
     for (let i = 0; i < N.ple; i++) {
@@ -568,19 +572,175 @@ var QTool = class _QTool {
     error = {
       ple: { min: -0.1, max: 0.1, step: 5e-3 },
       ore: { min: -0.1, max: 0.1, step: 5e-3 }
-    }
+    },
+    axes = true,
+    axesLabel = {
+      ple: "pulse length error",
+      ore: "off-resonance error"
+    },
+    padding = {
+      top: 10,
+      bottom: 50,
+      left: 50,
+      right: 10
+    },
+    labelMargin = {
+      ple: 30,
+      ore: 26
+    },
+    labelFont = "13px serif",
+    ticsFont = "13px serif",
+    ticsMargin = {
+      ple: 4,
+      ore: 4,
+      colorBar: 4
+    },
+    colorBar = true,
+    colorBarWidth = 14,
+    colorBarMargin = {
+      left: 10,
+      right: 50
+    },
+    colorBarTicsFont = "13px serif",
+    colorBarTicsNum = 5
   }) {
-    const { errorList, fidelityList } = _QTool.calculateFidelity(gateName, theta, phi, error);
+    const { errorList, fidelityList } = _QTool.calculateFidelity(
+      gateName,
+      theta,
+      phi,
+      error
+    );
     const pleMesh = height / errorList.length;
     const oreMesh = width / errorList[0].length;
-    const { canvas, ctx, clearCanvas } = _QTool.createCanvas2D(target, { width, height });
+    const { canvas, ctx, clearCanvas } = _QTool.createCanvas2D(target, {
+      width: width + (axes ? padding.left + padding.right : 0) + (colorBar ? colorBarWidth + colorBarMargin.left + colorBarMargin.right : 0),
+      height: height + (axes ? padding.top + padding.bottom : 0)
+    });
     clearCanvas();
     if (ctx) {
+      let fidelity2color2 = function(fidelity, threshold2) {
+        return Math.floor(
+          (Math.max(fidelity, threshold2) - threshold2) / (1 - threshold2) * 255
+        );
+      };
+      ctx.save();
+      if (axes) {
+        ctx.translate(padding.left, padding.top);
+      }
       fidelityList.forEach(({ fidelity, pleIdx, oreIdx }) => {
-        const colorValue = Math.floor((Math.max(fidelity, threshold) - threshold) / (1 - threshold) * 255);
+        const colorValue = fidelity2color2(fidelity, threshold);
         ctx.fillStyle = fillStyle(colorValue);
-        ctx.fillRect(oreIdx * oreMesh - overFill / 2, pleIdx * pleMesh - overFill / 2, oreMesh + overFill, pleMesh + overFill);
+        ctx.fillRect(
+          oreIdx * oreMesh - overFill / 2,
+          width - pleMesh - pleIdx * pleMesh - overFill / 2,
+          oreMesh + overFill,
+          pleMesh + overFill
+        );
       });
+      if (axes) {
+        ctx.save();
+        ctx.save();
+        ctx.font = labelFont;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "bottom";
+        ctx.translate(-labelMargin.ple, height / 2);
+        ctx.rotate(-Math.PI / 2);
+        ctx.fillText(axesLabel.ple, 0, 0);
+        ctx.restore();
+        ctx.save();
+        ctx.font = ticsFont;
+        ctx.textAlign = "right";
+        ctx.textBaseline = "middle";
+        ctx.save();
+        ctx.textBaseline = "top";
+        ctx.translate(-ticsMargin.ple, 0);
+        ctx.fillText(`${error.ple.max}`, 0, 0);
+        ctx.restore();
+        ctx.save();
+        ctx.translate(-ticsMargin.ple, height / 2);
+        const mid_ple = (error.ple.max + error.ple.min) / 2;
+        ctx.fillText(`${mid_ple.toFixed(mid_ple === 0 ? 0 : 1)}`, 0, 0);
+        ctx.restore();
+        ctx.save();
+        ctx.textBaseline = "bottom";
+        ctx.translate(-ticsMargin.ple, height);
+        ctx.fillText(`${error.ple.min}`, 0, 0);
+        ctx.restore();
+        ctx.restore();
+        ctx.save();
+        ctx.font = labelFont;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "top";
+        ctx.translate(width / 2, height + labelMargin.ore);
+        ctx.fillText(axesLabel.ore, 0, 0);
+        ctx.restore();
+        ctx.save();
+        ctx.font = ticsFont;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "top";
+        ctx.save();
+        ctx.textAlign = "left";
+        ctx.translate(0, height + ticsMargin.ore);
+        ctx.fillText(`${error.ore.min}`, 0, 0);
+        ctx.restore();
+        ctx.save();
+        ctx.translate(width / 2, height + ticsMargin.ore);
+        const mid_ore = (error.ore.max + error.ore.min) / 2;
+        ctx.fillText(`${mid_ore.toFixed(mid_ore === 0 ? 0 : 1)}`, 0, 0);
+        ctx.restore();
+        ctx.save();
+        ctx.textAlign = "right";
+        ctx.translate(width, height + ticsMargin.ore);
+        ctx.fillText(`${error.ore.max}`, 0, 0);
+        ctx.restore();
+        ctx.restore();
+        ctx.restore();
+      }
+      if (colorBar) {
+        ctx.save();
+        ctx.translate(width + colorBarMargin.left, 0);
+        const d = (1 - threshold) / height;
+        for (let i = 0; i < height; i++) {
+          const value = threshold + d * i;
+          ctx.fillStyle = fillStyle(fidelity2color2(value, threshold));
+          ctx.fillRect(0, height - i - 1, colorBarWidth, 1);
+        }
+        ctx.save();
+        ctx.strokeStyle = "rgb(0,0,0)";
+        ctx.lineWidth = 2;
+        ctx.strokeRect(0, 1, colorBarWidth - 1, height - 2);
+        ctx.restore();
+        ctx.lineWidth = 1;
+        for (let i = 1; i < colorBarTicsNum; i++) {
+          ctx.save();
+          ctx.translate(0, height - height * i / colorBarTicsNum);
+          ctx.beginPath();
+          ctx.moveTo(1, 0);
+          ctx.lineTo(colorBarWidth - 1, 0);
+          ctx.stroke();
+          ctx.restore();
+        }
+        ctx.restore();
+        ctx.save();
+        ctx.font = colorBarTicsFont;
+        ctx.translate(width + colorBarMargin.left + colorBarWidth, 0);
+        ctx.textAlign = "left";
+        ctx.textBaseline = "middle";
+        ctx.fillText(`1`, ticsMargin.colorBar, 0);
+        ctx.save();
+        ctx.translate(0, height);
+        ctx.fillText(`${threshold}`, ticsMargin.colorBar, 0);
+        ctx.restore();
+        for (let i = 1; i < colorBarTicsNum; i++) {
+          ctx.save();
+          const value = threshold + (1 - threshold) * i / colorBarTicsNum;
+          ctx.translate(0, height - height * i / colorBarTicsNum);
+          ctx.fillText(`${value}`, ticsMargin.colorBar, 0);
+          ctx.restore();
+        }
+        ctx.restore();
+      }
+      ctx.restore();
     }
   }
   static drawBloch(create, {
@@ -682,10 +842,7 @@ var QTool = class _QTool {
       phi: p.phi(angle, phi)
     }));
     let currentState = initState;
-    let eState = [
-      initState,
-      initState
-    ];
+    let eState = [initState, initState];
     const { create, camera, controls, animate, helper, destroy } = init(target);
     camera.position.set(...view.position);
     if (draggable) {
@@ -758,10 +915,22 @@ var QTool = class _QTool {
         dTheta = pulses[gateIndex].theta - currentTheta;
         flag = true;
       }
-      const g = new QGate(dTheta, [Math.cos(pulses[gateIndex].phi), Math.sin(pulses[gateIndex].phi), 0]);
+      const g = new QGate(dTheta, [
+        Math.cos(pulses[gateIndex].phi),
+        Math.sin(pulses[gateIndex].phi),
+        0
+      ]);
       const eg = [
-        new QGate((1 + ple) * dTheta, [Math.cos(pulses[gateIndex].phi), Math.sin(pulses[gateIndex].phi), ore]),
-        new QGate((1 - ple) * dTheta, [Math.cos(pulses[gateIndex].phi), Math.sin(pulses[gateIndex].phi), -ore])
+        new QGate((1 + ple) * dTheta, [
+          Math.cos(pulses[gateIndex].phi),
+          Math.sin(pulses[gateIndex].phi),
+          ore
+        ]),
+        new QGate((1 - ple) * dTheta, [
+          Math.cos(pulses[gateIndex].phi),
+          Math.sin(pulses[gateIndex].phi),
+          -ore
+        ])
       ];
       currentState = g.apply(currentState);
       eState = eState.map((st, i) => eg[i].apply(st));
@@ -793,5 +962,6 @@ exports.QGate = QGate;
 exports.QMatrix = QMatrix;
 exports.QState = QState;
 exports.QTool = QTool;
+exports.createCCCP = createCCCP;
 //# sourceMappingURL=index.cjs.map
 //# sourceMappingURL=index.cjs.map

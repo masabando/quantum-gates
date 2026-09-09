@@ -93,6 +93,7 @@ type CP = {
     pulse: Pulse$1[];
 };
 declare const CPList: Record<string, CP>;
+declare function createCCCP(pulseA: string, pulseB: string, reduced?: boolean): CP;
 
 type Target = string | HTMLElement | null | undefined;
 type Pulse = {
@@ -147,7 +148,7 @@ declare class QTool {
             oreIdx: number;
         }[];
     };
-    static createFidelityMap({ target, gateName, theta, phi, width, height, threshold, fillStyle, overFill, error }: {
+    static createFidelityMap({ target, gateName, theta, phi, width, height, threshold, fillStyle, overFill, error, axes, axesLabel, padding, labelMargin, labelFont, ticsFont, ticsMargin, colorBar, colorBarWidth, colorBarMargin, colorBarTicsFont, colorBarTicsNum, }: {
         target: Target;
         gateName: string;
         theta: number;
@@ -169,8 +170,38 @@ declare class QTool {
                 step: number;
             };
         };
+        axes?: boolean;
+        axesLabel?: {
+            ple: string;
+            ore: string;
+        };
+        padding?: {
+            top: number;
+            bottom: number;
+            left: number;
+            right: number;
+        };
+        labelMargin?: {
+            ple: number;
+            ore: number;
+        };
+        ticsMargin?: {
+            ple: number;
+            ore: number;
+            colorBar: number;
+        };
+        labelFont?: string;
+        ticsFont?: string;
+        colorBar?: boolean;
+        colorBarWidth?: number;
+        colorBarMargin?: {
+            left: number;
+            right: number;
+        };
+        colorBarTicsFont?: string;
+        colorBarTicsNum?: number;
     }): void;
-    static drawBloch(create: any, { ringWeight, ringNum, color }?: {
+    static drawBloch(create: any, { ringWeight, ringNum, color, }?: {
         ringWeight?: number;
         ringNum?: {
             azimuthal: number;
@@ -182,7 +213,7 @@ declare class QTool {
             ringSub: number;
         };
     }): void;
-    static createAnimation({ init, target, pulseName, angle, phi, initState, speed, draggable, light, bloch, point, view }: {
+    static createAnimation({ init, target, pulseName, angle, phi, initState, speed, draggable, light, bloch, point, view, }: {
         init: any;
         target: Target;
         pulseName: string;
@@ -237,4 +268,4 @@ declare class QTool {
     };
 }
 
-export { CPList, Complex, Constant, QGate, QMatrix, QState, QTool };
+export { CPList, Complex, Constant, QGate, QMatrix, QState, QTool, createCCCP };

@@ -15,12 +15,21 @@
     }
   }
 </script>
+<style>
+  td {
+    text-align: center;
+  }
+  td div {
+    font-size: 0;
+  }
+  tr:nth-child(even) td {
+    padding-bottom: 10px;
+  }
+</style>
 </head>
 
 <body>
 
-  <div id="bloch" style="width:400px; aspect-ratio: 1;"></div>
-  <div id="target"></div>
 
   <script type="module" src="./main.js"></script>
 </body>

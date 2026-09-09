@@ -3,7 +3,6 @@ import CPList from "../CPList";
 
 type Target = string | HTMLElement | null | undefined;
 
-
 type Pulse = {
   theta: (_theta: number, _phi: number) => number;
   phi: (_theta: number, _phi: number) => number;
@@ -11,25 +10,44 @@ type Pulse = {
 };
 
 export default class QTool {
-  static evalGate(pulse: Pulse[], theta: number, phi: number, ple: number, ore: number): QGate {
+  static evalGate(
+    pulse: Pulse[],
+    theta: number,
+    phi: number,
+    ple: number,
+    ore: number,
+  ): QGate {
     let gate = new QGate();
-    pulse.map(p => {
-      const th = p.theta(theta, phi);
-      const ph = p.phi(theta, phi);
-      return new QGate(th * (1 + ple), [Math.cos(ph), Math.sin(ph), ore]);
-    }).reverse().forEach(g => {
-      gate = gate.multiply(g);
-    })
+    pulse
+      .map((p) => {
+        const th = p.theta(theta, phi);
+        const ph = p.phi(theta, phi);
+        return new QGate(th * (1 + ple), [Math.cos(ph), Math.sin(ph), ore]);
+      })
+      .reverse()
+      .forEach((g) => {
+        gate = gate.multiply(g);
+      });
     return gate;
   }
 
-  static createCanvas2D(targetId: Target, { width = 400, height = 400 }: { width?: number; height?: number } = {}): { canvas: HTMLCanvasElement; ctx: CanvasRenderingContext2D | null; clearCanvas: () => void } {
+  static createCanvas2D(
+    targetId: Target,
+    { width = 400, height = 400 }: { width?: number; height?: number } = {},
+  ): {
+    canvas: HTMLCanvasElement;
+    ctx: CanvasRenderingContext2D | null;
+    clearCanvas: () => void;
+  } {
     const canvas = document.createElement("canvas");
     canvas.width = width;
     canvas.height = height;
     canvas.style.aspectRatio = (width / height).toString();
     canvas.style.maxWidth = "100%";
-    const t = typeof targetId === "string" ? document.querySelector(`${targetId}`) : targetId;
+    const t =
+      typeof targetId === "string"
+        ? document.querySelector(`${targetId}`)
+        : targetId;
     if (!t) {
       throw new Error(`Target element with id "${targetId}" not found.`);
     }
@@ -37,18 +55,29 @@ export default class QTool {
     const ctx = canvas.getContext("2d");
     const clearCanvas = () => {
       ctx?.clearRect(0, 0, canvas.width, canvas.height);
-    }
+    };
     return { canvas, ctx, clearCanvas };
   }
 
-  static createErrorList(errorRange: { ple: { min: number; max: number; step: number }; ore: { min: number; max: number; step: number } } = {
-    ple: { min: -0.1, max: 0.1, step: 0.001 },
-    ore: { min: -0.1, max: 0.1, step: 0.001 },
-  }): { ple: number; ore: number }[][] {
+  static createErrorList(
+    errorRange: {
+      ple: { min: number; max: number; step: number };
+      ore: { min: number; max: number; step: number };
+    } = {
+      ple: { min: -0.1, max: 0.1, step: 0.001 },
+      ore: { min: -0.1, max: 0.1, step: 0.001 },
+    },
+  ): { ple: number; ore: number }[][] {
     const N = {
-      ple: Math.floor((errorRange.ple.max - errorRange.ple.min) / errorRange.ple.step) + 1,
-      ore: Math.floor((errorRange.ore.max - errorRange.ore.min) / errorRange.ore.step) + 1,
-    }
+      ple:
+        Math.floor(
+          (errorRange.ple.max - errorRange.ple.min) / errorRange.ple.step,
+        ) + 1,
+      ore:
+        Math.floor(
+          (errorRange.ore.max - errorRange.ore.min) / errorRange.ore.step,
+        ) + 1,
+    };
     const errorList = [];
     for (let i = 0; i < N.ple; i++) {
       const l = [];
@@ -67,17 +96,25 @@ export default class QTool {
     gateName: string,
     theta: number,
     phi: number,
-    error: { ple: { min: number; max: number; step: number }; ore: { min: number; max: number; step: number } } = {
+    error: {
+      ple: { min: number; max: number; step: number };
+      ore: { min: number; max: number; step: number };
+    } = {
       ple: { min: -0.1, max: 0.1, step: 0.001 },
       ore: { min: -0.1, max: 0.1, step: 0.001 },
-    }): { errorList: { ple: number; ore: number }[][]; fidelityList: { fidelity: number; pleIdx: number; oreIdx: number }[] } {
+    },
+  ): {
+    errorList: { ple: number; ore: number }[][];
+    fidelityList: { fidelity: number; pleIdx: number; oreIdx: number }[];
+  } {
     const CompositeGate = CPList[gateName].pulse;
     const plain = CPList.plain.pulse;
 
     const idealGate = QTool.evalGate(plain, theta, phi, 0, 0);
     const errorList = QTool.createErrorList(error);
 
-    const fidelityList: { fidelity: number; pleIdx: number; oreIdx: number }[] = [];
+    const fidelityList: { fidelity: number; pleIdx: number; oreIdx: number }[] =
+      [];
     errorList.forEach((row, pleIdx) => {
       row.forEach((error, oreIdx) => {
         const { ple, ore } = error;
@@ -104,8 +141,38 @@ export default class QTool {
     overFill = 1,
     error = {
       ple: { min: -0.1, max: 0.1, step: 0.005 },
-      ore: { min: -0.1, max: 0.1, step: 0.005 }
-    }
+      ore: { min: -0.1, max: 0.1, step: 0.005 },
+    },
+    axes = true,
+    axesLabel = {
+      ple: "pulse length error",
+      ore: "off-resonance error",
+    },
+    padding = {
+      top: 10,
+      bottom: 50,
+      left: 50,
+      right: 10,
+    },
+    labelMargin = {
+      ple: 30,
+      ore: 26,
+    },
+    labelFont = "13px serif",
+    ticsFont = "13px serif",
+    ticsMargin = {
+      ple: 4,
+      ore: 4,
+      colorBar: 4,
+    },
+    colorBar = true,
+    colorBarWidth = 14,
+    colorBarMargin = {
+      left: 10,
+      right: 50
+    },
+    colorBarTicsFont = "13px serif",
+    colorBarTicsNum = 5,
   }: {
     target: Target;
     gateName: string;
@@ -116,37 +183,186 @@ export default class QTool {
     threshold?: number;
     fillStyle?: (val: number) => string;
     overFill?: number;
-    error?: { ple: { min: number; max: number; step: number }; ore: { min: number; max: number; step: number } };
+    error?: {
+      ple: { min: number; max: number; step: number };
+      ore: { min: number; max: number; step: number };
+    };
+    axes?: boolean;
+    axesLabel?: { ple: string; ore: string };
+    padding?: { top: number; bottom: number; left: number; right: number };
+    labelMargin?: { ple: number; ore: number };
+    ticsMargin?: { ple: number; ore: number; colorBar: number };
+    labelFont?: string;
+    ticsFont?: string;
+    colorBar?: boolean;
+    colorBarWidth?: number;
+    colorBarMargin?: { left: number; right: number };
+    colorBarTicsFont?: string;
+    colorBarTicsNum?: number;
   }) {
-    const { errorList, fidelityList } = QTool.calculateFidelity(gateName, theta, phi, error)
+    const { errorList, fidelityList } = QTool.calculateFidelity(
+      gateName,
+      theta,
+      phi,
+      error,
+    );
 
     const pleMesh = height / errorList.length;
     const oreMesh = width / errorList[0].length;
-    const { canvas, ctx, clearCanvas } = QTool.createCanvas2D(target, { width, height });
+    const { canvas, ctx, clearCanvas } = QTool.createCanvas2D(target, {
+      width: width + (axes ? padding.left + padding.right : 0) + (colorBar ? colorBarWidth + colorBarMargin.left + colorBarMargin.right : 0),
+      height: height + (axes ? padding.top + padding.bottom : 0),
+    });
     clearCanvas();
 
     if (ctx) {
+      ctx.save();
+      if (axes) {
+        ctx.translate(padding.left, padding.top);
+      }
+      function fidelity2color(fidelity: number, threshold: number) {
+        return Math.floor(
+          ((Math.max(fidelity, threshold) - threshold) / (1 - threshold)) * 255,
+        );
+      }
       fidelityList.forEach(({ fidelity, pleIdx, oreIdx }) => {
-        const colorValue = Math.floor(((Math.max(fidelity, threshold) - threshold) / (1 - threshold)) * 255);
+        const colorValue = fidelity2color(fidelity, threshold);
         ctx.fillStyle = fillStyle(colorValue);
-        ctx.fillRect(oreIdx * oreMesh - overFill / 2, pleIdx * pleMesh - overFill / 2, oreMesh + overFill, pleMesh + overFill);
+        ctx.fillRect(
+          oreIdx * oreMesh - overFill / 2,
+          width - pleMesh - pleIdx * pleMesh - overFill / 2,
+          oreMesh + overFill,
+          pleMesh + overFill,
+        );
       });
+      if (axes) {
+        ctx.save();
+        // PLE ==============
+        ctx.save();
+        ctx.font = labelFont;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "bottom";
+        ctx.translate(-labelMargin.ple, height / 2);
+        ctx.rotate(-Math.PI / 2);
+        ctx.fillText(axesLabel.ple, 0, 0);
+        ctx.restore();
+        // PLE tics --------
+        ctx.save();
+        ctx.font = ticsFont;
+        ctx.textAlign = "right";
+        ctx.textBaseline = "middle";
+        ctx.save();
+        ctx.textBaseline = "top";
+        ctx.translate(-ticsMargin.ple, 0);
+        ctx.fillText(`${error.ple.max}`, 0, 0);
+        ctx.restore();
+        ctx.save();
+        ctx.translate(-ticsMargin.ple, height / 2);
+        const mid_ple = (error.ple.max + error.ple.min) / 2;
+        ctx.fillText(`${mid_ple.toFixed(mid_ple === 0 ? 0 : 1)}`, 0, 0);
+        ctx.restore();
+        ctx.save();
+        ctx.textBaseline = "bottom";
+        ctx.translate(-ticsMargin.ple, height);
+        ctx.fillText(`${error.ple.min}`, 0, 0);
+        ctx.restore();
+        ctx.restore();
+        // ORE ==============
+        ctx.save();
+        ctx.font = labelFont;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "top";
+        ctx.translate(width / 2, height + labelMargin.ore);
+        ctx.fillText(axesLabel.ore, 0, 0);
+        ctx.restore();
+        // ORE tics --------
+        ctx.save();
+        ctx.font = ticsFont;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "top";
+        ctx.save();
+        ctx.textAlign = "left";
+        ctx.translate(0, height + ticsMargin.ore);
+        ctx.fillText(`${error.ore.min}`, 0, 0);
+        ctx.restore();
+        ctx.save();
+        ctx.translate(width / 2, height + ticsMargin.ore);
+        const mid_ore = (error.ore.max + error.ore.min) / 2;
+        ctx.fillText(`${mid_ore.toFixed(mid_ore === 0 ? 0 : 1)}`, 0, 0);
+        ctx.restore();
+        ctx.save();
+        ctx.textAlign = "right";
+        ctx.translate(width, height + ticsMargin.ore);
+        ctx.fillText(`${error.ore.max}`, 0, 0);
+        ctx.restore();
+        ctx.restore();
+        ctx.restore();
+      }
+      if (colorBar) {
+        ctx.save();
+        ctx.translate(width + colorBarMargin.left, 0);
+        const d = (1 - threshold) / height;
+        for (let i = 0; i < height; i++) {
+          const value = threshold + d * i;
+          ctx.fillStyle = fillStyle(fidelity2color(value, threshold));
+          ctx.fillRect(0, height - i - 1, colorBarWidth, 1);
+        }
+        ctx.save();
+        ctx.strokeStyle = "rgb(0,0,0)";
+        ctx.lineWidth = 2;
+        ctx.strokeRect(0, 1, colorBarWidth - 1, height - 2);
+        ctx.restore();
+        ctx.lineWidth = 1;
+        for (let i = 1; i < colorBarTicsNum; i++) {
+          ctx.save();
+          ctx.translate(0, height - (height * i) / colorBarTicsNum);
+          ctx.beginPath();
+          ctx.moveTo(1, 0);
+          ctx.lineTo(colorBarWidth - 1, 0);
+          ctx.stroke();
+          ctx.restore();
+        }
+        ctx.restore();
+        // color bar tics
+        ctx.save();
+        ctx.font = colorBarTicsFont;
+        ctx.translate(width + colorBarMargin.left + colorBarWidth, 0);
+        ctx.textAlign = "left";
+        ctx.textBaseline = "middle";
+        ctx.fillText(`1`, ticsMargin.colorBar, 0);
+        ctx.save();
+        ctx.translate(0, height);
+        ctx.fillText(`${threshold}`, ticsMargin.colorBar, 0);
+        ctx.restore();
+        for (let i = 1; i < colorBarTicsNum; i++) {
+          ctx.save();
+          const value = threshold + ((1 - threshold) * i) / colorBarTicsNum;
+          ctx.translate(0, height - (height * i) / colorBarTicsNum);
+          ctx.fillText(`${value}`, ticsMargin.colorBar, 0);
+          ctx.restore();
+        }
+        ctx.restore();
+      }
+      ctx.restore();
     }
   }
 
-  static drawBloch(create: any, {
-    ringWeight = 0.01,
-    ringNum = { azimuthal: 7, polar: 8 },
-    color = {
-      sphere: 0x888888,
-      ringMain: 0x5555ff,
-      ringSub: 0xffffff,
-    }
-  }: {
-    ringWeight?: number;
-    ringNum?: { azimuthal: number; polar: number };
-    color?: { sphere: number; ringMain: number; ringSub: number };
-  } = {}) {
+  static drawBloch(
+    create: any,
+    {
+      ringWeight = 0.01,
+      ringNum = { azimuthal: 7, polar: 8 },
+      color = {
+        sphere: 0x888888,
+        ringMain: 0x5555ff,
+        ringSub: 0xffffff,
+      },
+    }: {
+      ringWeight?: number;
+      ringNum?: { azimuthal: number; polar: number };
+      color?: { sphere: number; ringMain: number; ringSub: number };
+    } = {},
+  ) {
     const Bloch = create.group({
       children: [
         create.sphere({
@@ -155,46 +371,50 @@ export default class QTool {
             opacity: 0.5,
             color: color.sphere,
           },
-          autoAdd: false
+          autoAdd: false,
         }),
         create.group({
-          children:
-            new Array(ringNum.polar).fill(0).map((_, i) => {
-              create.cylinder({
-                size: [1, 1, ringWeight],
-                segments: [128, 1],
-                rotation: [Math.PI / 2, 0, i * Math.PI / ringNum.polar],
-                openEnded: true,
-                option: {
-                  side: 2,
-                  color: (i === 0 || (i === ringNum.polar / 2)) ? color.ringMain : color.ringSub,
-                },
-                autoAdd: true
-              })
-            }),
-          autoAdd: false
+          children: new Array(ringNum.polar).fill(0).map((_, i) => {
+            create.cylinder({
+              size: [1, 1, ringWeight],
+              segments: [128, 1],
+              rotation: [Math.PI / 2, 0, (i * Math.PI) / ringNum.polar],
+              openEnded: true,
+              option: {
+                side: 2,
+                color:
+                  i === 0 || i === ringNum.polar / 2
+                    ? color.ringMain
+                    : color.ringSub,
+              },
+              autoAdd: true,
+            });
+          }),
+          autoAdd: false,
         }),
         create.group({
-          children:
-            new Array(ringNum.azimuthal).fill(0).map((_, i) => {
-              const theta = ((i + 1) / (ringNum.azimuthal + 1)) * Math.PI;
-              const r = Math.sin(theta);
-              create.cylinder({
-                size: [r, r, ringWeight],
-                segments: [128, 1],
-                position: [0, Math.cos(theta), 0],
-                openEnded: true,
-                option: {
-                  side: 2,
-                  color: (ringNum.azimuthal % 2 !== 0 && i === ~~(ringNum.azimuthal / 2)) ? color.ringMain : color.ringSub,
-                },
-                autoAdd: true
-              })
-            }),
-          autoAdd: false
-        })
-      ]
-    })
+          children: new Array(ringNum.azimuthal).fill(0).map((_, i) => {
+            const theta = ((i + 1) / (ringNum.azimuthal + 1)) * Math.PI;
+            const r = Math.sin(theta);
+            create.cylinder({
+              size: [r, r, ringWeight],
+              segments: [128, 1],
+              position: [0, Math.cos(theta), 0],
+              openEnded: true,
+              option: {
+                side: 2,
+                color:
+                  ringNum.azimuthal % 2 !== 0 && i === ~~(ringNum.azimuthal / 2)
+                    ? color.ringMain
+                    : color.ringSub,
+              },
+              autoAdd: true,
+            });
+          }),
+          autoAdd: false,
+        }),
+      ],
+    });
   }
 
   static createAnimation({
@@ -217,7 +437,7 @@ export default class QTool {
         sphere: 0x888888,
         ringMain: 0x5555ff,
         ringSub: 0xffffff,
-      }
+      },
     },
     point = {
       size: {
@@ -229,11 +449,11 @@ export default class QTool {
         normal: 0x7777ff,
         errorP: 0xff7777,
         errorN: 0xffaaaa,
-      }
+      },
     },
     view = {
       position: [0, 0, -2],
-    }
+    },
   }: {
     init: any;
     target: Target;
@@ -265,14 +485,12 @@ export default class QTool {
     helper: any;
     destroy: any;
   } {
-    const pulses = CPList[pulseName].pulse.map(p => ({
+    const pulses = CPList[pulseName].pulse.map((p) => ({
       theta: p.theta(angle, phi),
       phi: p.phi(angle, phi),
     }));
     let currentState = initState;
-    let eState = [
-      initState, initState
-    ]
+    let eState = [initState, initState];
 
     const { create, camera, controls, animate, helper, destroy } = init(target);
 
@@ -288,7 +506,7 @@ export default class QTool {
     });
     directionalLight.shadow.bias = -0.0001;
 
-    helper.axes({ size: 1 })
+    helper.axes({ size: 1 });
 
     QTool.drawBloch(create, {
       ringWeight: bloch.ringWeight,
@@ -302,7 +520,7 @@ export default class QTool {
       option: {
         color: point?.color?.normal ?? 0x7777ff,
       },
-    })
+    });
     const errorPoint = [
       create.sphere({
         size: point?.size?.errorP ?? 0.04,
@@ -317,16 +535,16 @@ export default class QTool {
         option: {
           color: point?.color?.errorN ?? 0xffaaaa,
         },
-      })
-    ]
-
+      }),
+    ];
 
     let mode = 0;
     let counter = 0;
     const waitTime = [1, 2];
     let currentTheta = 0;
     let gateIndex = 0;
-    const ple = 0.05, ore = 0.05;
+    const ple = 0.05,
+      ore = 0.05;
     animate(({ delta }: { delta: number }) => {
       switch (mode) {
         case 0: // wait before start
@@ -354,15 +572,27 @@ export default class QTool {
         dTheta = pulses[gateIndex].theta - currentTheta;
         flag = true;
       }
-      const g = new QGate(dTheta, [Math.cos(pulses[gateIndex].phi), Math.sin(pulses[gateIndex].phi), 0]);
+      const g = new QGate(dTheta, [
+        Math.cos(pulses[gateIndex].phi),
+        Math.sin(pulses[gateIndex].phi),
+        0,
+      ]);
       const eg = [
-        new QGate((1 + ple) * dTheta, [Math.cos(pulses[gateIndex].phi), Math.sin(pulses[gateIndex].phi), ore]),
-        new QGate((1 - ple) * dTheta, [Math.cos(pulses[gateIndex].phi), Math.sin(pulses[gateIndex].phi), -ore]),
-      ]
+        new QGate((1 + ple) * dTheta, [
+          Math.cos(pulses[gateIndex].phi),
+          Math.sin(pulses[gateIndex].phi),
+          ore,
+        ]),
+        new QGate((1 - ple) * dTheta, [
+          Math.cos(pulses[gateIndex].phi),
+          Math.sin(pulses[gateIndex].phi),
+          -ore,
+        ]),
+      ];
       currentState = g.apply(currentState);
       eState = eState.map((st, i) => eg[i].apply(st));
       const xyz = currentState.xyz;
-      const Exyz = eState.map(st => st.xyz);
+      const Exyz = eState.map((st) => st.xyz);
       idealPoint.position.set(xyz.x, xyz.z, xyz.y);
       errorPoint[0].position.set(Exyz[0].x, Exyz[0].z, Exyz[0].y);
       errorPoint[1].position.set(Exyz[1].x, Exyz[1].z, Exyz[1].y);
