@@ -13,7 +13,7 @@ export default class QState {
     );
   }
 
-  toString(digit: number): string {
+  toString(digit?: number): string {
     return `[${this.vector.map(value => value.toString(digit)).join(this.column ? "\n" : ", ")}]`;
   }
 

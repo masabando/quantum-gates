@@ -29,7 +29,7 @@ declare class QState {
     vector: Complex[];
     column: boolean;
     constructor(vector: number[] | Complex[], column?: boolean);
-    toString(digit: number): string;
+    toString(digit?: number): string;
     scale(scalar: Complex | number): QState;
     magnitude(): number;
     normalize(): QState;
